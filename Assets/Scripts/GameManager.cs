@@ -7,6 +7,7 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private LevelManager levelManager;
+    [SerializeField] private ButtonManager buttonManager;
     [SerializeField] private float moveTime = 0.2f;
     [SerializeField] private TextMeshProUGUI Title;
     [SerializeField] private GameObject winPanel;
@@ -22,21 +23,23 @@ public class GameManager : MonoBehaviour
     public LevelManager LevelManager { get => levelManager;}
     public GameObject WinPanel { get => winPanel;}
     private void Awake() {
-        PlayerPrefs.SetInt("currentLevel", 0);
-        levelManager.createCurrentLevel();
-        balls = levelManager.getBalls();
-        tubes = levelManager.getTubes();
-    }
-
-    private void Start(){
         StartCoroutine(changeColorTitle());
+        PlayerPrefs.SetInt("isLevelScene", 0);
+        buttonManager.createButtons();
+        PlayerPrefs.SetInt("currentLevel", 0);
+    }
+    public void setBallsAndTubes(Stack<BallView>[] balls, List<TubeView> tubes){
+        this.balls = balls;
+        this.tubes = tubes;
     }
     private void Update() {
-        playGame();
+        if(PlayerPrefs.GetInt("isLevelScene") == 1){
+            playGame();
         
-        if(isGameFinished() && isPanelOpenable) {
-            winPanel.SetActive(true);
-            isPanelOpenable = false;
+            if(isGameFinished() && isPanelOpenable) {
+                winPanel.SetActive(true);
+                isPanelOpenable = false;
+            }
         }
     }
 
@@ -56,7 +59,7 @@ public class GameManager : MonoBehaviour
     }
     public void startNextLevel(){
         cleanScreen();
-        levelManager.createCurrentLevel();
+        levelManager.createNextLevel();
         balls = levelManager.getBalls();
         tubes = levelManager.getTubes();
     }

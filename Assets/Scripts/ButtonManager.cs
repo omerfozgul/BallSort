@@ -13,18 +13,9 @@ public class ButtonManager : MonoBehaviour {
     [SerializeField] private Button homeButton;
     [SerializeField] private ButtonControl levelButton;
     [SerializeField] private GameObject buttonParent;
-
-    private bool level1flag = false;
-    private List<Button> buttonList; 
     private List<ButtonControl> buttonControlList;
 
-
-    private void Start(){
-        //createButtons();
-    }
     public void createButtons(){
-        //parametre olarak levelDataSO alabilir
-        buttonList = new List<Button>();
         buttonControlList = new List<ButtonControl>();
         for(int i=0; i<5; i++){
             ButtonControl btnControl = Instantiate(levelButton);
@@ -47,6 +38,8 @@ public class ButtonManager : MonoBehaviour {
         getActiveLevelObjects(true);
         levelText.text = "LEVEL" + i;
     }
+
+    //"next" button triggers nextLevel function
     public void nextLevel(){
         gameManager.startNextLevel();
         int currentLevelIndex = gameManager.LevelManager.CurrentLevelIndex;

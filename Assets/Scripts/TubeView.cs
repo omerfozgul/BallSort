@@ -8,13 +8,8 @@ public class TubeView : MonoBehaviour {
     [SerializeField] private RectTransform topOfTubeRectTransform;
     [SerializeField] private GameObject tubeGameObject;
     
-
     public RectTransform RectTransform { get => rectTransform;}
     public RectTransform TopOfTubeRectTransform { get => topOfTubeRectTransform;}
-    public GameObject TubeGameObject { get => tubeGameObject; set => tubeGameObject = value; }
-}
-
-public class Tube : MonoBehaviour{
-    private TubeView tubeView;
-    private Stack<BallView> balls;
+    public GameObject TubeGameObject {get => tubeGameObject;}
+    
 }

@@ -22,7 +22,7 @@ public class LevelManager : MonoBehaviour
         currentLevelIndex = levelNum;
         createLevel(levelDataSO);
     }
-    public Stack<BallView>[] getBalls() {
+    public Tube[] getBalls() {
         return levelGenerator.getBalls();
     }
     public List<TubeView> getTubes(){

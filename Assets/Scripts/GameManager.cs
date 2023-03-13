@@ -12,25 +12,57 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI Title;
     [SerializeField] private GameObject winPanel;
 
-    private Stack<BallView>[] balls;
-    private List<TubeView> tubes; 
+    private Tube[] balls;
+    private List<TubeView> TubeViewList; 
     private BallView _curBall;
     private TubeView _startTubeView;
     private Stack<BallView> _startStack;
     private int _startStackIndex, _endStackIndex;
-    private int curStage = 0;
+    private int curStage = 0;//0: top secilmedi, 1 top secildi
     private bool isPanelOpenable = true;//Panelin sadece bir kere acilmasini saglar
     public LevelManager LevelManager { get => levelManager;}
     public GameObject WinPanel { get => winPanel;}
+    
+
     private void Awake() {
         StartCoroutine(changeColorTitle());
         PlayerPrefs.SetInt("isLevelScene", 0);
         buttonManager.createButtons();
-        PlayerPrefs.SetInt("currentLevel", 0);
     }
-    public void setBallsAndTubes(Stack<BallView>[] balls, List<TubeView> tubes){
+
+
+    //Deneme Start
+    
+
+    public void deneme(TubeControl tubeControlRef){
+        string tubeTag = PlayerPrefs.GetString("CurrentBeherTag");
+        if(curStage == 0){
+            Debug.Log("1.beher: " + tubeTag);
+            curStage = 1; 
+        }
+        else{
+            Debug.Log("2.beher: " + tubeTag);
+            curStage = 0;
+        }
+    }
+
+    //Deneme End
+
+
+
+    public void setBallsAndTubes(Tube[] balls, List<TubeView> tubes){
         this.balls = balls;
-        this.tubes = tubes;
+        TubeViewList = tubes;
+
+        foreach(Tube tube in balls){
+            if(tube.TubeConrtol == null)    
+                Debug.Log("NULL");
+            else{
+                tube.TubeConrtol.OnPointerDown += deneme;
+                Debug.Log("asdfsadfsd");
+            }
+                
+        }
     }
     private void Update() {
         if(PlayerPrefs.GetInt("isLevelScene") == 1){
@@ -44,10 +76,10 @@ public class GameManager : MonoBehaviour
     }
 
     public void cleanScreen(){
-        while(tubes.Count > 0){
-            TubeView tubeView = tubes[0];
+        while(TubeViewList.Count > 0){
+            TubeView tubeView = TubeViewList[0];
             Destroy(tubeView.TubeGameObject);
-            tubes.RemoveAt(0);
+            TubeViewList.RemoveAt(0);
         }
         winPanel.SetActive(false);
         curStage = 0;
@@ -55,13 +87,13 @@ public class GameManager : MonoBehaviour
     }
     public void getReadyLevel(){
         balls = levelManager.getBalls();
-        tubes = levelManager.getTubes();
+        TubeViewList = levelManager.getTubes();
     }
     public void startNextLevel(){
         cleanScreen();
         levelManager.createNextLevel();
         balls = levelManager.getBalls();
-        tubes = levelManager.getTubes();
+        TubeViewList = levelManager.getTubes();
     }
 
     private IEnumerator changeColorTitle(){
@@ -79,13 +111,13 @@ public class GameManager : MonoBehaviour
             if (TubeManager.startIndexTube != -1)
             {
                 int startIndex = TubeManager.startIndexTube;
-                _startStack = balls[startIndex];
-                TubeView curTube = tubes[startIndex];
-                _startTubeView = curTube;
+                _startStack = balls[startIndex].getBallStack();
+                TubeView curTubeView = TubeViewList[startIndex];
+                _startTubeView = curTubeView;
                 if (_startStack.Count > 0)
                 {
                     _curBall = _startStack.Pop();
-                    StartCoroutine(PickBallOfTube(_curBall.RecTransform, curTube.RectTransform, curTube.TopOfTubeRectTransform));
+                    StartCoroutine(PickBallOfTube(_curBall.RecTransform, curTubeView.RectTransform, curTubeView.TopOfTubeRectTransform));
                     curStage = 1;
 
                     _startStackIndex = startIndex;
@@ -105,14 +137,14 @@ public class GameManager : MonoBehaviour
                 else
                 {//Farkli tube ise diger behere birakiliyor
                     int endIndex = TubeManager.endIndexTube;
-                    TubeView curTube = tubes[endIndex];
-                    Stack<BallView> endStack = balls[endIndex];
+                    TubeView curTubeView = TubeViewList[endIndex];
+                    Stack<BallView> endStack = balls[endIndex].getBallStack();
                     if (endStack.Count == 0 || (endStack.Count < 4 && _curBall.ColorKey == endStack.Peek().ColorKey))
                     {
                         //Ya tube bos olmali yada tube'un en tepesindeki ball'un rengi ile curBall'in rengi ayni olmali
                         endStack.Push(_curBall);
-                        _curBall.RecTransform.SetParent(curTube.RectTransform);
-                        StartCoroutine(moveCurrentBall(_curBall.RecTransform, curTube.RectTransform));
+                        _curBall.RecTransform.SetParent(curTubeView.RectTransform);
+                        StartCoroutine(moveCurrentBall(_curBall.RecTransform, curTubeView.RectTransform));
                     }
                     else
                     {
@@ -130,9 +162,8 @@ public class GameManager : MonoBehaviour
     
     private bool isGameFinished(){
         bool win = false;
-        for (int i = 0; i < balls.Length; i++)
-        {
-            win = testStack(balls[i]);
+        for (int i = 0; i < balls.Length; i++) {
+            win = testStack(balls[i].getBallStack());
             if (!win)
                 return false;
         }

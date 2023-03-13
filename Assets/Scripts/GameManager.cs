@@ -164,5 +164,3 @@ public class GameManager : MonoBehaviour
         return index;
     }
 }
-
-

@@ -6,5 +6,3 @@ public class LevelDataSO : ScriptableObject {
     [SerializeField] private List<TubeData> tubes;
     public List<TubeData> Tubes { get => tubes; }
 }
-
-

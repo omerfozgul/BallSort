@@ -1,17 +1,21 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
-public class Tube : MonoBehaviour{
+using UnityEngine.EventSystems;
+public class Tube : MonoBehaviour, IPointerDownHandler{
     [SerializeField] private TubeView tubeView;
-    [SerializeField] private TubeControl tubeConrtol;
     private Stack<BallView> ballStack;
-
+    public event Action<Tube> OnPointerDown;
     public TubeView TubeView { get => tubeView;}
-
     public Stack<BallView> getBallStack(){
         if(ballStack == null)
             ballStack = new Stack<BallView>();
         return ballStack;
     }
-    
-    public TubeControl TubeConrtol { get => tubeConrtol;}
+
+    void IPointerDownHandler.OnPointerDown(PointerEventData eventData) {
+        Debug.Log("Tube(" + this.tag + ") is clicked");
+        PlayerPrefs.SetString("CurrentBeherTag", this.tag);
+        OnPointerDown?.Invoke(this);
+    }
 }

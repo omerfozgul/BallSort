@@ -34,7 +34,6 @@ public class ButtonManager : MonoBehaviour {
         PlayerPrefs.SetInt("isLevelScene", 1);
         gameManager.LevelManager.createLevel(i-1);
         gameManager.setBallsAndTubes(gameManager.LevelManager.getBalls(), gameManager.LevelManager.getTubes());
-        gameManager.getReadyLevel();
         getActiveLevelObjects(true);
         levelText.text = "LEVEL" + i;
     }

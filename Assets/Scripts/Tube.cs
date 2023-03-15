@@ -14,8 +14,7 @@ public class Tube : MonoBehaviour, IPointerDownHandler{
     }
 
     void IPointerDownHandler.OnPointerDown(PointerEventData eventData) {
-        Debug.Log("Tube(" + this.tag + ") is clicked");
-        PlayerPrefs.SetString("CurrentBeherTag", this.tag);
+        PlayerPrefs.SetString("CurrentBeherTag", this.tag);//burasi degistirilebilir mi?
         OnPointerDown?.Invoke(this);
     }
 }

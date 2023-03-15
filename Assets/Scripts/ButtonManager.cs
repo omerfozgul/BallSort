@@ -9,7 +9,6 @@ public class ButtonManager : MonoBehaviour {
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject tubes;
     [SerializeField] private TextMeshProUGUI levelText;
-    //[SerializeField] private ButtonControl[] buttonArr;
     [SerializeField] private Button homeButton;
     [SerializeField] private ButtonControl levelButton;
     [SerializeField] private GameObject buttonParent;
@@ -31,9 +30,7 @@ public class ButtonManager : MonoBehaviour {
     }
     private void level(int i){
         //i is actual level number here
-        PlayerPrefs.SetInt("isLevelScene", 1);
-        gameManager.LevelManager.createLevel(i-1);
-        gameManager.setBallsAndTubes(gameManager.LevelManager.getBalls(), gameManager.LevelManager.getTubes());
+        gameManager.startLevel(i-1);
         getActiveLevelObjects(true);
         levelText.text = "LEVEL" + i;
     }
@@ -41,13 +38,12 @@ public class ButtonManager : MonoBehaviour {
     //"next" button triggers nextLevel function
     public void nextLevel(){
         gameManager.startNextLevel();
-        int currentLevelIndex = gameManager.LevelManager.CurrentLevelIndex;
+        int currentLevelIndex = gameManager.GetCurrentLevelIndex();
         buttonControlList[currentLevelIndex].setActiveButton(true);
         levelText.text = "LEVEL" +(currentLevelIndex + 1);
     }
 
     public void MainMenu(){
-        PlayerPrefs.SetInt("isLevelScene", 0);
         gameManager.cleanScreen();
         getActiveLevelObjects(false);
     }

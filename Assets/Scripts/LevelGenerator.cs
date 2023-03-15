@@ -7,13 +7,9 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] private Transform TubesParent;
     [SerializeField] private BallView ballViewPrefab;
     [SerializeField] private Tube tubePrefab;
-
-    private List<TubeView> tubeViews;
     private Tube[] tubes;
 
     public void generateLevel(LevelDataSO levelData, ColorData[] colors) {
-
-        tubeViews = new List<TubeView>();
         List<TubeData> TubeDataList = levelData.Tubes;
         tubes = new Tube[TubeDataList.Count];
 
@@ -24,16 +20,17 @@ public class LevelGenerator : MonoBehaviour
             Tube curTube = Instantiate(tubePrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, TubesParent);
             curTube.tag = "tube" + tubeIndex.ToString();
 
-            tubeViews.Add(curTube.TubeView);
+            
             curTube.TubeView.RectTransform.pivot = new Vector2(curTube.TubeView.RectTransform.pivot.x, defaultTubeTransformY);
 
             foreach(BallData ball in tube.Balls) {
                 ballViewPrefab.BallImage.color = getColor(ball.Color, colors);
 
-                //creating ball object
+                //creating ball object, coloring and pushing to stack
                 BallView curBall = Instantiate(ballViewPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, curTube.TubeView.RectTransform);
                 curBall.ColorKey = ball.Color;
                 curTube.getBallStack().Push(curBall);
+
                 //pivot is rising up
                 curTube.TubeView.RectTransform.pivot = new Vector2(curTube.TubeView.RectTransform.pivot.x, curTube.TubeView.RectTransform.pivot.y + 0.2f);
             }
@@ -41,10 +38,14 @@ public class LevelGenerator : MonoBehaviour
             tubeIndex++;
         }
     }
-    public Tube[] getBalls(){
+    public Tube[] GetTubes(){
         return tubes;
     }
-    public List<TubeView> getTubes(){
+    public List<TubeView> GetTubeViews(){
+        List<TubeView> tubeViews = new List<TubeView>();
+        foreach(Tube curTube in tubes){
+            tubeViews.Add(curTube.TubeView);
+        }
         return tubeViews;
     }
     private Color getColor(ColorKey key, ColorData[] colorData) {

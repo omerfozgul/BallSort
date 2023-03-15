@@ -13,8 +13,6 @@ public struct ColorData{
 public class GeneralDataSO : ScriptableObject {
     [SerializeField] private LevelDataSO[] levelDataSOArray ;
     [SerializeField] private ColorData[] colors;
-
-
-    public LevelDataSO[] LevelDataSOArray { get => levelDataSOArray; }
+     public LevelDataSO[] LevelDataSOArray { get => levelDataSOArray; }
     public ColorData[] Colors { get => colors; }
 }

@@ -13,55 +13,51 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI Title;
     [SerializeField] private GameObject winPanel;
 
-    private Tube[] balls;
+    private Tube[] Tubes;
     private List<TubeView> TubeViewList; 
     private BallView m_curBall;
     private int m_startStackIndex, m_endStackIndex;
     private int curStage = 0;//0: top secilmedi, 1 top secildi
-    public LevelManager LevelManager { get => levelManager;}
-    public GameObject WinPanel { get => winPanel;}
     
 
     private void Awake() {
         StartCoroutine(changeColorTitle());
-        PlayerPrefs.SetInt("isLevelScene", 0);
         buttonManager.createButtons();
     }
     public void playBall(Tube tubeRef){
         string tubeTag = PlayerPrefs.GetString("CurrentBeherTag");
         if(curStage == 0){
             m_startStackIndex = TubeTagToIndex(tubeTag);
-            Stack<BallView>startStack = balls[m_startStackIndex].getBallStack();
+            Stack<BallView>startStack = Tubes[m_startStackIndex].getBallStack();
             TubeView curTubeView = TubeViewList[m_startStackIndex];
             if (startStack.Count > 0) {
                 m_curBall = startStack.Pop();
                 PickBallOfTube(m_curBall.RecTransform, curTubeView.RectTransform, curTubeView.TopOfTubeRectTransform);
                 curStage = 1;
-                //m_startStackIndex = startIndex;
             }
         }
         else{
             m_endStackIndex = TubeTagToIndex(tubeTag);
             if (m_startStackIndex == m_endStackIndex){
                 //Ayni index geldiyse top tube'a geri birakiliyor
-                TubeView startTubeView = balls[m_startStackIndex].TubeView;
-                Stack<BallView> startStack = balls[m_startStackIndex].getBallStack();
+                TubeView startTubeView = Tubes[m_startStackIndex].TubeView;
+                Stack<BallView> startStack = Tubes[m_startStackIndex].getBallStack();
                 moveCurrentBall(m_curBall.RecTransform, startTubeView.RectTransform);
                 startStack.Push(m_curBall);
             }
             else{
                 //Farkli tube ise diger behere birakiliyor
                 TubeView curTubeView = TubeViewList[m_endStackIndex];
-                Stack<BallView> endStack = balls[m_endStackIndex].getBallStack();
+                Stack<BallView> endStack = Tubes[m_endStackIndex].getBallStack();
                 if (endStack.Count == 0 || (endStack.Count < 4 && m_curBall.ColorKey == endStack.Peek().ColorKey)){
                     //Ya tube bos olmali yada tube'un en tepesindeki ball'un rengi ile curBall'in rengi ayni olmali
                     endStack.Push(m_curBall);
                     m_curBall.RecTransform.SetParent(curTubeView.RectTransform);
                     moveCurrentBall(m_curBall.RecTransform, curTubeView.RectTransform);
                 }
-                else {
-                    TubeView startTubeView = balls[m_startStackIndex].TubeView;
-                    Stack<BallView> startStack = balls[m_startStackIndex].getBallStack();
+                else {//Degilse, geldigi tube'a geri birakiliyor
+                    TubeView startTubeView = Tubes[m_startStackIndex].TubeView;
+                    Stack<BallView> startStack = Tubes[m_startStackIndex].getBallStack();
                     moveCurrentBall(m_curBall.RecTransform, startTubeView.RectTransform);
                     startStack.Push(m_curBall);
                 }
@@ -70,17 +66,25 @@ public class GameManager : MonoBehaviour
         }
 
         if(isGameFinished()){
-            foreach(Tube tube in balls)
+            foreach(Tube tube in Tubes)
                 tube.OnPointerDown -= playBall;
             winPanel.SetActive(true);
         }
             
     }
+    public void startLevel(int levelNum){
+        levelManager.createLevel(levelNum);
+        Tubes = levelManager.GetTubes();
+        TubeViewList = levelManager.GetTubeViews();
+        foreach(Tube tube in Tubes){
+            tube.OnPointerDown += playBall;
+        }
+    }
 
-    public void setBallsAndTubes(Tube[] balls, List<TubeView> tubes){
-        this.balls = balls;
-        TubeViewList = tubes;
-        foreach(Tube tube in balls){
+    public void setBallsAndTubes(Tube[] tubes, List<TubeView> tubeViews){
+        Tubes = tubes;
+        TubeViewList = tubeViews;
+        foreach(Tube tube in Tubes){
             tube.OnPointerDown += playBall;
         }
     }
@@ -94,18 +98,12 @@ public class GameManager : MonoBehaviour
         winPanel.SetActive(false);
         curStage = 0;
     }
-    public void getReadyLevel(){
-        balls = levelManager.getBalls();
-        TubeViewList = levelManager.getTubes();
-    }
     public void startNextLevel(){
         cleanScreen();
-        levelManager.createNextLevel();
-        balls = levelManager.getBalls();
-        TubeViewList = levelManager.getTubes();
-        foreach(Tube tube in balls){
-            tube.OnPointerDown += playBall;
-        }
+        startLevel(levelManager.CurrentLevelIndex+1);
+    }
+    public int GetCurrentLevelIndex(){
+        return levelManager.CurrentLevelIndex;
     }
 
     private IEnumerator changeColorTitle(){
@@ -118,8 +116,8 @@ public class GameManager : MonoBehaviour
     
     private bool isGameFinished(){
         bool win = false;
-        for (int i = 0; i < balls.Length; i++) {
-            win = testStack(balls[i].getBallStack());
+        for (int i = 0; i < Tubes.Length; i++) {
+            win = testStack(Tubes[i].getBallStack());
             if (!win)
                 return false;
         }

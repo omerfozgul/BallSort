@@ -22,10 +22,10 @@ public class LevelManager : MonoBehaviour
         currentLevelIndex = levelNum;
         createLevel(levelDataSO);
     }
-    public Tube[] getBalls() {
-        return levelGenerator.getBalls();
+    public Tube[] GetTubes() {
+        return levelGenerator.GetTubes();
     }
-    public List<TubeView> getTubes(){
-        return levelGenerator.getTubes();
+    public List<TubeView> GetTubeViews(){
+        return levelGenerator.GetTubeViews();
     }
 }

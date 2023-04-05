@@ -29,7 +29,7 @@ public class LevelGenerator : MonoBehaviour
                 //creating ball object, coloring and pushing to stack
                 BallView curBall = Instantiate(ballViewPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, curTube.TubeView.RectTransform);
                 curBall.ColorKey = ball.Color;
-                curTube.getBallStack().Push(curBall);
+                curTube.BallStack.Push(curBall);
 
                 //pivot is rising up
                 curTube.TubeView.RectTransform.pivot = new Vector2(curTube.TubeView.RectTransform.pivot.x, curTube.TubeView.RectTransform.pivot.y + 0.2f);

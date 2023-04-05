@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
         string tubeTag = PlayerPrefs.GetString("CurrentBeherTag");
         if(curStage == 0){
             m_startStackIndex = TubeTagToIndex(tubeTag);
-            Stack<BallView>startStack = Tubes[m_startStackIndex].getBallStack();
+            Stack<BallView>startStack = Tubes[m_startStackIndex].BallStack;
             TubeView curTubeView = TubeViewList[m_startStackIndex];
             if (startStack.Count > 0) {
                 m_curBall = startStack.Pop();
@@ -41,14 +41,14 @@ public class GameManager : MonoBehaviour
             if (m_startStackIndex == m_endStackIndex){
                 //Ayni index geldiyse top tube'a geri birakiliyor
                 TubeView startTubeView = Tubes[m_startStackIndex].TubeView;
-                Stack<BallView> startStack = Tubes[m_startStackIndex].getBallStack();
+                Stack<BallView> startStack = Tubes[m_startStackIndex].BallStack;
                 moveCurrentBall(m_curBall.RecTransform, startTubeView.RectTransform);
                 startStack.Push(m_curBall);
             }
             else{
                 //Farkli tube ise diger behere birakiliyor
                 TubeView curTubeView = TubeViewList[m_endStackIndex];
-                Stack<BallView> endStack = Tubes[m_endStackIndex].getBallStack();
+                Stack<BallView> endStack = Tubes[m_endStackIndex].BallStack;
                 if (endStack.Count == 0 || (endStack.Count < 4 && m_curBall.ColorKey == endStack.Peek().ColorKey)){
                     //Ya tube bos olmali yada tube'un en tepesindeki ball'un rengi ile curBall'in rengi ayni olmali
                     endStack.Push(m_curBall);
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
                 }
                 else {//Degilse, geldigi tube'a geri birakiliyor
                     TubeView startTubeView = Tubes[m_startStackIndex].TubeView;
-                    Stack<BallView> startStack = Tubes[m_startStackIndex].getBallStack();
+                    Stack<BallView> startStack = Tubes[m_startStackIndex].BallStack;
                     moveCurrentBall(m_curBall.RecTransform, startTubeView.RectTransform);
                     startStack.Push(m_curBall);
                 }
@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviour
     private bool isGameFinished(){
         bool win = false;
         for (int i = 0; i < Tubes.Length; i++) {
-            win = testStack(Tubes[i].getBallStack());
+            win = testStack(Tubes[i].BallStack);
             if (!win)
                 return false;
         }
